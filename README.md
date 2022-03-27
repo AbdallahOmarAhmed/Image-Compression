@@ -10,3 +10,5 @@ Image Compression using deep learning
       
 ### decompress an image : 
       $ decompress.py [compressed file path] [output path.jpg]
+
+sorry its not ready yet.
