@@ -11,9 +11,6 @@ batch_size = 14
 learning_rate = 0.001
 ssim_scale = 5
 
-# min_mse = float('inf')
-# min_ssim = float('inf')
-
 
 class Jpeg(nn.Module):
     def __init__(self, quality=10):
@@ -185,11 +182,6 @@ class ImageCompression(LightningModule):
         pred = self(target)
         loss1 = torch.sum(self.Loss(pred, target) * edges) / self.pixels
         loss2 = 1 - torch.sum(metrics.ssim(pred, target)) / len(target)
-        # import ipdb;ipdb.set_trace()
-        # loss = loss1 + loss2/ssim_scale
-        # if math.isnan(loss) or math.isinf(loss):
-        #     import ipdb;ipdb.set_trace()
-        # self.log("train loss all", loss, on_step=False, on_epoch=True, prog_bar=False, logger=True)
         self.log("train mse loss", loss1, on_step=False, on_epoch=True, prog_bar=False, logger=True)
         self.log("train ssim loss", loss2, on_step=False, on_epoch=True, prog_bar=False, logger=True)
         return loss1 + loss2 * ssim_scale
@@ -199,42 +191,5 @@ class ImageCompression(LightningModule):
         pred = self(target)
         loss1 = torch.sum(self.Loss(pred, target)) / self.pixels
         loss2 = 1 - torch.sum(metrics.ssim(pred, target)) / len(target)
-        # loss = loss1 + loss2/ssim_scale
-        # self.log('test loss all', loss, on_step=False, on_epoch=True, prog_bar=False, logger=True)
         self.log('test mse loss', loss1, on_step=False, on_epoch=True, prog_bar=False, logger=True)
         self.log('test ssim loss', loss2, on_step=False, on_epoch=True, prog_bar=False, logger=True)
-
-# if __name__ == '__main__':
-    # totensor = transforms.ToTensor()
-    # model = ImageCompression()
-    # orig = Image.open("test.jpg")
-    # image = totensor(orig).unsqueeze(0)
-    # x1, x2, x3 = model.compression(image)
-    # import ipdb;ipdb.set_trace()
-
-    # train_data = Celeb(train=True)
-    # test_data = Celeb(train=False)
-    # train_dataLoader = DataLoader(train_data, batch_size=1, shuffle=True)
-    # test_dataLoader = DataLoader(test_data, batch_size=1, shuffle=False)
-    # model = ImageCompression()
-    # model = ImageCompression.load_from_checkpoint(
-    #     'lightning_logs/full_data_set_18_layer_schduler_basic/checkpoints/epoch=29-step=62519.ckpt')
-    # model.eval()
-    # loss = torch.nn.MSELoss()
-    # pil = transforms.ToPILImage()
-    # for x in test_dataLoader:
-    #     images = x
-    #     out = model(images).clamp(0, 1)
-    #     output = pil(out.squeeze(0))
-    #     print(loss(out, images))
-    #     orig = pil(x.squeeze(0))
-    #     show = np.hstack((np.array(orig), np.array(output)))
-    #     opencvImage = cv2.cvtColor(show, cv2.COLOR_RGB2BGR)
-    #     cv2.imshow('test', opencvImage)
-    #     cv2.waitKey(0)
-
-# full_data_8_layer_schduler_basic_no_grad v0
-# full_data_18_layer_schduler_basic_no_grad v3
-# full_data_18_layer_schduler_basic_no_grad_drob_2 v4
-
-#
