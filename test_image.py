@@ -1,12 +1,12 @@
 import argparse
 import sys
 from io import BytesIO
-
+import time
 import cv2
 # from lightning_logs.basic_model import ImageCompression
 import numpy
-
-from model import ImageCompression
+import matplotlib.pyplot as plt
+from model2 import ImageCompression2
 import numpy as np
 import torch
 from PIL import Image
@@ -16,8 +16,8 @@ from torchvision.transforms import transforms
 from dataset import Celeb
 from pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
 import pickle
-import imgaug.augmenters as iaa
 
+from new_dataset import NewDataset
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', '--path')
@@ -33,8 +33,9 @@ args = parser.parse_args()
 
 # transform = transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
 # pil = transforms.ToPILImage()
-model = ImageCompression.load_from_checkpoint(
-    'lightning_logs/version_0/epoch=32-step=58937.ckpt')
+model = ImageCompression2.load_from_checkpoint(
+    'lightning_logs/version_10/checkpoints/epoch=19-step=23120.ckpt')
+model.to("cpu")
 model.eval()
 loss = torch.nn.MSELoss()
 pil = transforms.ToPILImage()
@@ -49,11 +50,11 @@ def save(img, path):
 
 if args.path == None:
     # import ipdb;ipdb.set_trace()
-    train_data = Celeb(train=True)
-    test_data = Celeb(train=False)
+    test_data = NewDataset(train=False)
+    train_data = NewDataset(train=True)
     train_dataLoader = DataLoader(train_data, batch_size=1, shuffle=True)
     test_dataLoader = DataLoader(test_data, batch_size=1, shuffle=True)
-    for x in test_dataLoader:
+    for x, _ in train_dataLoader:
         images = x
         x0 = model(images)
         out = (x0+1)/2
@@ -63,10 +64,17 @@ if args.path == None:
         print('ssim :', ssim(x0, images, data_range=1, size_average=True))
         print("________________________\n")
         orig = pil((x.squeeze(0)+1)/2)
-        show = np.hstack((np.array(orig), np.array(output)))
-        opencvImage = cv2.cvtColor(show, cv2.COLOR_RGB2BGR)
-        cv2.imshow('test', opencvImage)
-        cv2.waitKey(0)
+        orig.show()
+        output.show()
+        break
+
+        # time.sleep(1)  # Wait for 1 second
+        # plt.close()  # Close the figure
+
+        # show = np.hstack((np.array(orig), np.array(output)))
+        # opencvImage = cv2.cvtColor(show, cv2.COLOR_RGB2BGR)
+        # cv2.imshow('test', opencvImage)
+        # cv2.waitKey(0)
 
 else:
     outputIoStream = BytesIO()

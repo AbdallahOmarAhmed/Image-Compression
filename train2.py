@@ -21,7 +21,6 @@ model = ImageCompression2()
 
 trainer = Trainer( max_epochs=100)
 # Perform learning rate finder
-trainer.tune(model, train_dataloaders=train_dataLoader, val_dataloaders=test_dataLoader)
 # trainer.fit(model, train_dataLoader, test_dataLoader,
 #             ckpt_path="lightning_logs/version_2/checkpoints/epoch=5-step=13866.ckpt")
 trainer.fit(model, train_dataLoader, test_dataLoader)

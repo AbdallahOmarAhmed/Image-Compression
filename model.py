@@ -1,13 +1,13 @@
 import torch
 from torch import nn
-from pytorch_lightning.core.lightning import LightningModule
+from lightning import LightningModule
 from torch.optim import Adam, lr_scheduler
 from torchjpeg import quantization, dct, metrics
 import warnings
 from dataset import img_size
 
 warnings.filterwarnings('ignore')
-batch_size = 14
+batch_size = 20
 learning_rate = 0.001
 ssim_scale = 5
 

@@ -10,8 +10,11 @@ parser.add_argument('imgPath')
 parser.add_argument('outPath')
 args = parser.parse_args()
 
-model = ImageCompression.load_from_checkpoint('lightning_logs/version_0/epoch=32-step=58937.ckpt')
+model = ImageCompression.load_from_checkpoint('lightning_logs/version_5/checkpoints/epoch=30-step=71641.ckpt')
+model.to("cpu")
+
 model.eval()
+
 
 pil = transforms.ToPILImage()
 totensor = transforms.ToTensor()
