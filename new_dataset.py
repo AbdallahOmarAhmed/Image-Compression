@@ -34,7 +34,7 @@ class NewDataset(Dataset):
             img_gray = numpy.array(image.resize((img_size, img_size)).convert('L'))
             canny = torch.from_numpy(cv2.Canny(image=img_gray, threshold1=50, threshold2=50))
             sobel = torch.from_numpy(cv2.Sobel(src=img_gray, ddepth=cv2.CV_32F, dx=1, dy=1, ksize=5))
-            edges = (torch.sigmoid(sobel)+(canny/255)).unsqueeze(0) + 1
+            edges = ((torch.sigmoid(sobel)+(canny/255)).unsqueeze(0) / 2) + 1
             return img, edges
         return img
 
@@ -43,7 +43,8 @@ if __name__ == '__main__':
     data = NewDataset(True)
     for i in range(1000):
         x, edge = data[i+8]
+        print(edge.max(),edge.min())
         # import ipdb;ipdb.set_trace()
         # cv2.imshow("img", edge)
-        pil((x+1)/2).show()
-        cv2.waitKey(0)
+        # pil((x+1)/2).show()
+        break

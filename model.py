@@ -1,15 +1,16 @@
 import torch
 from torch import nn
-from lightning import LightningModule
+from pytorch_lightning import LightningModule
 from torch.optim import Adam, lr_scheduler
 from torchjpeg import quantization, dct, metrics
 import warnings
 from dataset import img_size
 
 warnings.filterwarnings('ignore')
-batch_size = 20
-learning_rate = 0.001
-ssim_scale = 5
+batch_size = 24 # 24
+learning_rate = 0.0001
+ssim_scale = 1
+mse_scale = 1
 
 
 class Jpeg(nn.Module):
@@ -152,7 +153,7 @@ class Decoder(nn.Module):
 class ImageCompression(LightningModule):
     def __init__(self, dense=16, p=0.1, q=50):
         super().__init__()
-        self.Loss = nn.L1Loss(reduction="none")
+        self.Loss = nn.MSELoss(reduction="none")
         self.pixels = img_size**2 * batch_size * 3
         self.jpeg = Jpeg(quality=q)
         self.encoder = Encoder(dense, p=p)
@@ -184,7 +185,7 @@ class ImageCompression(LightningModule):
         loss2 = 1 - torch.sum(metrics.ssim(pred, target)) / len(target)
         self.log("train mse loss", loss1, on_step=False, on_epoch=True, prog_bar=False, logger=True)
         self.log("train ssim loss", loss2, on_step=False, on_epoch=True, prog_bar=False, logger=True)
-        return loss1 + loss2 * ssim_scale
+        return loss1 * mse_scale + loss2 * ssim_scale
 
     def validation_step(self, batch, batch_idx):
         target = batch
